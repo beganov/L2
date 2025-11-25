@@ -1,7 +1,9 @@
 package main
 
-import _ "github.com/beganov/ntpserver"
+import (
+	"github.com/beganov/ntpserver/ntpserver"
+)
 
 func main() {
-	
+	ntpserver.GetExactTime()
 }
