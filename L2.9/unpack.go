@@ -30,8 +30,14 @@
 package unpack
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
+)
+
+var (
+	ErrOnlyNumbers       = errors.New("string contains only numbers")
+	ErrFirstSymbolNumber = errors.New("first symbol is a number")
+	ErrLastSlash         = errors.New("escape character at the end of string")
 )
 
 func StrUnpack(in string) (string, error) {
@@ -40,14 +46,18 @@ func StrUnpack(in string) (string, error) {
 	inRune := []rune(in)
 	outRune := make([]rune, 0, len(inRune))
 	for j := 0; j < len(inRune); j++ {
+		// Обработка обратного слеша
 		if inRune[j] == '\\' && !slashFlag {
 			slashFlag = true
+			//второй обратный слэш записыается
 			continue
 		}
+		// Если число и не экранировано
 		_, err := strconv.Atoi(string(inRune[j]))
 		if err == nil && !slashFlag {
 			p := j
 			for err == nil && j < len(inRune)-1 {
+				// Пропускаем все числа
 				j++
 				_, err = strconv.Atoi(string(inRune[j]))
 			}
@@ -55,30 +65,35 @@ func StrUnpack(in string) (string, error) {
 				j++
 			}
 			z, _ := strconv.Atoi(string(inRune[p:j]))
-			if len(outRune) > 0 {
-				for k := 0; k < z-1; k++ {
+			if len(outRune) > 0 { // Если были символы в строке
+				for k := 0; k < z-1; k++ { // распаковываем, дублируя предыдущий символ
 					outRune = append(outRune, outRune[len(outRune)-1])
 				}
+				if z == 0 { // Если 0 - распаковываем как отсутствие символа
+					outRune = outRune[:len(outRune)-1]
+				}
 			} else {
+				// Если символом первым идет число
 				firstSymbolFlag = true
-			}
-			if z == 0 {
-				outRune = outRune[:len(outRune)-1]
 			}
 			j--
 		} else {
+			// Если не число и не первый обратный слеш
 			outRune = append(outRune, inRune[j])
 			slashFlag = false
 		}
 	}
+	// Ошибка, если в строке только цифры
 	if len(outRune) == 0 && len(inRune) != 0 && firstSymbolFlag {
-		return "", fmt.Errorf("onlyNumbersError")
+		return "", ErrOnlyNumbers
 	}
+	// Ошибка, если первый символ - число
 	if firstSymbolFlag {
-		return "", fmt.Errorf("firstSymbolNumbersError")
+		return "", ErrFirstSymbolNumber
 	}
+	// Ошибка, если в конце -обратный слэш
 	if slashFlag {
-		return "", fmt.Errorf("LastSlahError")
+		return "", ErrLastSlash
 	}
 	return string(outRune), nil
 }

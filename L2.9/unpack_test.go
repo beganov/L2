@@ -1,6 +1,8 @@
 package unpack
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestStrUnpack(t *testing.T) {
 	tests := []struct {
@@ -28,6 +30,25 @@ func TestStrUnpack(t *testing.T) {
 			in:      "45",
 			want:    "",
 			wantErr: true},
+
+		{name: "Only Zero string",
+			in:      "0",
+			want:    "",
+			wantErr: true},
+
+		{
+			name:    "Double zero",
+			in:      "00",
+			want:    "",
+			wantErr: true,
+		},
+
+		{
+			name:    "Zero multiplier",
+			in:      "a0",
+			want:    "",
+			wantErr: false,
+		},
 
 		{name: "Zero string",
 			in:      "qwe0",
