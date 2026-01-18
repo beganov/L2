@@ -1,3 +1,25 @@
+// L2.10
+// Реализовать упрощённый аналог UNIX-утилиты sort (сортировка строк).
+// Программа должна читать строки (из файла или STDIN) и выводить их отсортированными.
+// Обязательные флаги (как в GNU sort):
+// -k N — сортировать по столбцу (колонке) №N (разделитель — табуляция по умолчанию).
+// Например, «sort -k 2» отсортирует строки по второму столбцу каждой строки.
+// -n — сортировать по числовому значению (строки интерпретируются как числа).
+// -r — сортировать в обратном порядке (reverse).
+// -u — не выводить повторяющиеся строки (только уникальные).
+// Дополнительные флаги:
+// -M — сортировать по названию месяца (Jan, Feb, ... Dec),
+// т.е. распознавать специфический формат дат.
+// -b — игнорировать хвостовые пробелы (trailing blanks).
+// -c — проверить, отсортированы ли данные; если нет, вывести сообщение об этом.
+// -h — сортировать по числовому значению с учётом суффиксов
+//  (например, К = килобайт, М = мегабайт — человекочитаемые размеры).
+// Программа должна корректно обрабатывать комбинации флагов
+// (например, -nr — числовая сортировка в обратном порядке, и т.д.).
+// Необходимо предусмотреть эффективную обработку больших файлов.
+// Код должен проходить все тесты, а также проверки go vet и golint
+// (понимание, что требуются надлежащие комментарии, имена и структура программы).
+
 package main
 
 import (
@@ -52,21 +74,25 @@ func main() {
 	human := flag.Bool("h", false, "сортировать по числовому значению с учётом суффиксов")
 	column := flag.Int("k", 1, "сортировать по столбцу №N")
 
-	fmt.Println(normalisedArgs)
 	var err error
 	err = flag.CommandLine.Parse(normalisedArgs)
 	if err != nil {
-		fmt.Println(normalisedArgs)
+		fmt.Fprintf(os.Stderr, "Ошибка парсинга аргументов: %v\n", err)
+		flag.Usage()
+		os.Exit(1)
+
 	}
 	var inputArray []string
 	if len(flag.Args()) > 0 {
 		inputArray, err = custom_sort.Input(flag.Args()[0])
 		if err != nil {
-			inputArray = custom_sort.STDIN(flag.Args())
+			fmt.Fprintf(os.Stderr, "Ошибка парсинга: %v\n", err)
+			flag.Usage()
+			os.Exit(1)
 		}
 	} else {
+		fmt.Println("hehe")
 		inputArray = custom_sort.STDIN(flag.Args())
 	}
-	fmt.Printf("n=%v, r=%v, u=%v, b=%v, m=%v, c=%v, h=%v, k=%d\n", *numeric, *reverse, *unique, *blank, *month, *check, *human, *column)
 	fmt.Println(custom_sort.Init(*numeric, *reverse, *unique, *blank, *month, *check, *human, *column, inputArray))
 }

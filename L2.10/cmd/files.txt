@@ -1,2 +1,30 @@
-4 
-4
+100 apple
+50 banana
+200 cherry
+75 date
+150 elderberry
+apple
+banana
+cherry
+date
+elderberry
+duplicate
+duplicate
+unique1
+unique2
+duplicate
+January
+March
+December
+July
+April
+1K file1
+2M file2
+500 file3
+1G file4
+100K file5
+apple red 100
+banana yellow 50
+cherry red 200
+date brown 75
+elderberry purple 150
